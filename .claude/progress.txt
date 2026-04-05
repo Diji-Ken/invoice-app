@@ -1,0 +1,1 @@
+🎯 目的: 請求書SaaS (Invoy風) 構築 | 📍 現在: Phase1-2完了 (Auth/Layout/PDF/CRUD全て完成, tsc 0 errors) | ✅ 次: Supabase新規PJ作成→.env設定→dev server起動→動作確認
