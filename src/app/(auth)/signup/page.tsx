@@ -41,7 +41,7 @@ export default function SignupPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -54,11 +54,18 @@ export default function SignupPage() {
       return;
     }
 
-    // Create organization, org_member, and company_settings
+    const userId = signUpData.user?.id;
+    if (!userId) {
+      toast.error('ユーザーIDの取得に失敗しました');
+      setLoading(false);
+      return;
+    }
+
+    // Create organization, org_member, and company_settings (uses service_role key server-side)
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ companyName }),
+      body: JSON.stringify({ companyName, userId }),
     });
 
     if (!res.ok) {

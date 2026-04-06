@@ -1,16 +1,21 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@supabase/supabase-js';
 
 export async function POST(request: Request) {
-  const { companyName } = await request.json();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { companyName, userId } = await request.json();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!userId || !companyName) {
+    return NextResponse.json(
+      { error: 'userId and companyName are required' },
+      { status: 400 }
+    );
   }
+
+  // Use service_role key for bootstrapping (org creation during signup)
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   // Create organization
   const { data: org, error: orgError } = await supabase
@@ -26,7 +31,7 @@ export async function POST(request: Request) {
   // Create org member (owner)
   const { error: memberError } = await supabase.from('org_members').insert({
     organization_id: org.id,
-    user_id: user.id,
+    user_id: userId,
     role: 'owner',
   });
 
