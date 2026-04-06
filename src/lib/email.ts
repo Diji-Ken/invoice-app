@@ -2,7 +2,9 @@ import { Resend } from 'resend';
 import type { Invoice, Customer, CompanySettings } from './types';
 import { fmtDate, fmtCurrency } from './invoice-helpers';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 interface SendInvoiceEmailParams {
   invoice: Invoice;
@@ -82,7 +84,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
   // Resend requires verified domain. For development, use onboarding@resend.dev
   const from = process.env.RESEND_FROM_EMAIL || `${settings.company_name} <${fromEmail}>`;
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from,
     to: customer.email,
     subject,
