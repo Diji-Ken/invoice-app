@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     const url = request.nextUrl;
     const status = url.searchParams.get('status');
     const customerId = url.searchParams.get('customerId');
+    const recurringId = url.searchParams.get('recurringId');
     const search = url.searchParams.get('search');
     const page = parseInt(url.searchParams.get('page') || '1', 10);
     const limit = parseInt(url.searchParams.get('limit') || '20', 10);
@@ -48,6 +49,10 @@ export async function GET(request: NextRequest) {
 
     if (customerId) {
       query = query.eq('customer_id', customerId);
+    }
+
+    if (recurringId) {
+      query = query.eq('recurring_invoice_id', recurringId);
     }
 
     if (search) {

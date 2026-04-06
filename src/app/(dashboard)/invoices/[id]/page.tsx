@@ -7,6 +7,7 @@ import {
   Download,
   Edit,
   Send,
+  Mail,
   CheckCircle,
   Copy,
   Trash2,
@@ -18,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { fmtDate, fmtCurrency } from '@/lib/invoice-helpers';
+import { toast } from 'sonner';
 import type { Invoice, InvoiceStatus } from '@/lib/types';
 
 type InvoiceWithCustomer = Omit<Invoice, 'customer'> & {
@@ -40,6 +42,7 @@ export default function InvoiceDetailPage({
   const [loading, setLoading] = useState(true);
   const [pdfLoading, setPdfLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [sendLoading, setSendLoading] = useState(false);
 
   useEffect(() => {
     fetchInvoice();
@@ -120,6 +123,25 @@ export default function InvoiceDetailPage({
     router.push('/invoices/new');
   }
 
+  async function handleSendEmail() {
+    if (!invoice) return;
+    setSendLoading(true);
+    try {
+      const res = await fetch(`/api/invoices/${id}/send`, { method: 'POST' });
+      if (res.ok) {
+        toast.success('メールを送信しました');
+        await fetchInvoice();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'メール送信に失敗しました');
+      }
+    } catch {
+      toast.error('メール送信に失敗しました');
+    } finally {
+      setSendLoading(false);
+    }
+  }
+
   function handleDownload() {
     window.open(`/api/invoices/${id}/pdf`, '_blank');
   }
@@ -195,6 +217,15 @@ export default function InvoiceDetailPage({
               <Button
                 size="sm"
                 variant="outline"
+                onClick={handleSendEmail}
+                disabled={sendLoading}
+              >
+                {sendLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Mail className="h-4 w-4 mr-1" />}
+                メール送信
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={handleDownload}
               >
                 <Download className="h-4 w-4 mr-1" />
@@ -204,14 +235,25 @@ export default function InvoiceDetailPage({
           )}
 
           {invoice.status === 'sent' && (
-            <Button
-              size="sm"
-              onClick={() => changeStatus('paid')}
-              disabled={actionLoading}
-            >
-              <CheckCircle className="h-4 w-4 mr-1" />
-              入金済みにする
-            </Button>
+            <>
+              <Button
+                size="sm"
+                onClick={() => changeStatus('paid')}
+                disabled={actionLoading}
+              >
+                <CheckCircle className="h-4 w-4 mr-1" />
+                入金済みにする
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSendEmail}
+                disabled={sendLoading}
+              >
+                {sendLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Mail className="h-4 w-4 mr-1" />}
+                メール送信
+              </Button>
+            </>
           )}
 
           {/* Common actions */}
