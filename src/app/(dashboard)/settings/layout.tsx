@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const settingsNav = [
   { href: '/settings/company', label: '\u4F1A\u793E\u60C5\u5831' },
   { href: '/settings/invoice', label: '\u8ACB\u6C42\u66F8\u8A2D\u5B9A' },
+  { href: '/settings/email', label: '\u30E1\u30FC\u30EB\u9001\u4FE1' },
   { href: '/settings/members', label: '\u30E1\u30F3\u30D0\u30FC' },
 ];
 

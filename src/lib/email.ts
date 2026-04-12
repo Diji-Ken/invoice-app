@@ -1,12 +1,9 @@
-import { Resend } from 'resend';
-import type { Invoice, Customer, CompanySettings } from './types';
+import type { Invoice, Customer, CompanySettings, EmailConfig } from './types';
 import { fmtDate, fmtCurrency } from './invoice-helpers';
-
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
-}
+import { sendEmail, EmailNotConfiguredError } from './email/sender';
 
 interface SendInvoiceEmailParams {
+  config: EmailConfig;
   invoice: Invoice;
   customer: Customer;
   settings: CompanySettings;
@@ -25,7 +22,7 @@ function replacePlaceholders(template: string, params: {
   return template
     .replace(/\{請求先会社名\}/g, customer.company_name)
     .replace(/\{請求先担当者名\}/g, customer.contact_person || '')
-    .replace(/\{商品名\}/g, invoice.subject)
+    .replace(/\{商品名\}/g, invoice.subject || '')
     .replace(/\{支払期限\}/g, invoice.payment_due_date ? fmtDate(invoice.payment_due_date) : '')
     .replace(/\{取引日\}/g, fmtDate(invoice.issue_date))
     .replace(/\{月\}/g, String(month))
@@ -68,7 +65,7 @@ Email: {請求元メールアドレス}
 -----------`;
 
 export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
-  const { invoice, customer, settings, pdfBuffer } = params;
+  const { config, invoice, customer, settings, pdfBuffer } = params;
 
   if (!customer.email) {
     throw new Error('取引先のメールアドレスが設定されていません');
@@ -77,15 +74,10 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
   const subjectTemplate = settings.email_subject_template || DEFAULT_SUBJECT;
   const bodyTemplate = settings.email_body_template || DEFAULT_BODY;
 
-  const subject = replacePlaceholders(subjectTemplate, params);
-  const body = replacePlaceholders(bodyTemplate, params);
+  const subject = replacePlaceholders(subjectTemplate, { invoice, customer, settings });
+  const body = replacePlaceholders(bodyTemplate, { invoice, customer, settings });
 
-  const fromEmail = settings.sender_email || settings.email || 'noreply@example.com';
-  // Resend requires verified domain. For development, use onboarding@resend.dev
-  const from = process.env.RESEND_FROM_EMAIL || `${settings.company_name} <${fromEmail}>`;
-
-  const { data, error } = await getResend().emails.send({
-    from,
+  return sendEmail(config, {
     to: customer.email,
     subject,
     text: body,
@@ -96,10 +88,6 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
       },
     ],
   });
-
-  if (error) {
-    throw new Error(`メール送信に失敗しました: ${error.message}`);
-  }
-
-  return data;
 }
+
+export { EmailNotConfiguredError };

@@ -8,6 +8,7 @@ const tocItems = [
   { href: '/help/invoices', label: '請求書の作成' },
   { href: '/help/pdf', label: 'PDFの出力' },
   { href: '/help/email', label: 'メール送信' },
+  { href: '/help/email-setup', label: 'メール送信設定' },
   { href: '/help/recurring', label: '定期請求' },
   { href: '/help/status', label: 'ステータス管理' },
   { href: '/help/faq', label: 'よくある質問' },

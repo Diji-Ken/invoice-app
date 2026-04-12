@@ -133,7 +133,17 @@ export default function InvoiceDetailPage({
         await fetchInvoice();
       } else {
         const err = await res.json();
-        toast.error(err.error || 'メール送信に失敗しました');
+        if (err.code === 'EMAIL_NOT_CONFIGURED') {
+          toast.error('メール送信が未設定です', {
+            description: '設定ページから送信元メールを設定してください',
+            action: {
+              label: '設定を開く',
+              onClick: () => router.push('/settings/email'),
+            },
+          });
+        } else {
+          toast.error(err.error || 'メール送信に失敗しました');
+        }
       }
     } catch {
       toast.error('メール送信に失敗しました');

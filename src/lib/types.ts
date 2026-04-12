@@ -122,3 +122,24 @@ export interface InvoiceLog {
   details: Record<string, unknown>;
   created_at: string;
 }
+
+export type EmailProvider = 'none' | 'gmail' | 'outlook' | 'icloud' | 'yahoo' | 'xserver' | 'custom_smtp';
+
+export interface EmailConfig {
+  organization_id: string;
+  provider: EmailProvider;
+  smtp_host: string | null;
+  smtp_port: number | null;
+  smtp_secure: boolean | null;
+  smtp_user: string | null;
+  smtp_password_encrypted: string | null;
+  from_name: string | null;
+  from_address: string | null;
+  reply_to: string | null;
+  verified: boolean;
+  verified_at: string | null;
+  last_test_at: string | null;
+  last_test_error: string | null;
+  created_at: string;
+  updated_at: string;
+}
