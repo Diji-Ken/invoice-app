@@ -90,9 +90,12 @@ export default function InvoicesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">請求書</h1>
-        <Button onClick={() => router.push('/invoices/new')}>
+        <Button
+          onClick={() => router.push('/invoices/new')}
+          className="w-full sm:w-auto"
+        >
           <Plus className="h-4 w-4 mr-2" />
           新規作成
         </Button>
@@ -100,17 +103,23 @@ export default function InvoicesPage() {
 
       {/* Tabs + Search */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Tabs value={status} onValueChange={handleStatusChange} className="w-full sm:w-auto">
-          <TabsList>
-            {statusTabs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="text-xs sm:text-sm">
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <Tabs
+          value={status}
+          onValueChange={handleStatusChange}
+          className="-mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-auto"
+        >
+          <div className="overflow-x-auto px-4 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <TabsList className="w-max">
+              {statusTabs.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value} className="text-xs sm:text-sm">
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
         </Tabs>
 
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="請求番号・件名で検索"

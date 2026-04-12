@@ -223,36 +223,73 @@ export default async function DashboardPage() {
               {'\u8ACB\u6C42\u66F8\u304C\u307E\u3060\u3042\u308A\u307E\u305B\u3093'}
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{'\u8ACB\u6C42\u66F8\u756A\u53F7'}</TableHead>
-                  <TableHead>{'\u53D6\u5F15\u5148'}</TableHead>
-                  <TableHead className="text-right">{'\u91D1\u984D'}</TableHead>
-                  <TableHead>{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
-                  <TableHead>{'\u767A\u884C\u65E5'}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop table */}
+              <Table className="hidden md:table">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{'\u8ACB\u6C42\u66F8\u756A\u53F7'}</TableHead>
+                    <TableHead>{'\u53D6\u5F15\u5148'}</TableHead>
+                    <TableHead className="text-right">{'\u91D1\u984D'}</TableHead>
+                    <TableHead>{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
+                    <TableHead>{'\u767A\u884C\u65E5'}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">
+                        {invoice.invoice_number}
+                      </TableCell>
+                      <TableCell>{invoice.customer_name}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(invoice.total)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariant[invoice.status] ?? 'secondary'}>
+                          {statusLabels[invoice.status] ?? invoice.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{invoice.issue_date}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-3">
                 {recentInvoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">
-                      {invoice.invoice_number}
-                    </TableCell>
-                    <TableCell>{invoice.customer_name}</TableCell>
-                    <TableCell className="text-right">
-                      {formatCurrency(invoice.total)}
-                    </TableCell>
-                    <TableCell>
+                  <div
+                    key={invoice.id}
+                    className="rounded-md border p-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 space-y-1">
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {invoice.invoice_number}
+                        </p>
+                        <p className="truncate text-sm font-medium">
+                          {invoice.customer_name}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-sm font-bold tabular-nums">
+                          {formatCurrency(invoice.total)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2">
                       <Badge variant={statusVariant[invoice.status] ?? 'secondary'}>
                         {statusLabels[invoice.status] ?? invoice.status}
                       </Badge>
-                    </TableCell>
-                    <TableCell>{invoice.issue_date}</TableCell>
-                  </TableRow>
+                      <span className="text-xs text-muted-foreground">
+                        {invoice.issue_date}
+                      </span>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

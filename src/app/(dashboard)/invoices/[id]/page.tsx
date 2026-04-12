@@ -169,15 +169,16 @@ export default function InvoiceDetailPage({
   return (
     <div className="space-y-4">
       {/* Action bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Button variant="ghost" onClick={() => router.push('/invoices')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          請求書一覧
-        </Button>
-
-        <div className="flex items-center gap-2 flex-1">
-          <span className="text-lg font-bold">{invoice.invoice_number}</span>
-          <InvoiceStatusBadge status={invoice.status} />
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className="flex items-center justify-between gap-2 lg:flex-1">
+          <Button variant="ghost" size="sm" onClick={() => router.push('/invoices')}>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            請求書一覧
+          </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold md:text-lg">{invoice.invoice_number}</span>
+            <InvoiceStatusBadge status={invoice.status} />
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -376,8 +377,7 @@ export default function InvoiceDetailPage({
             )}
             <iframe
               src={`/api/invoices/${id}/pdf`}
-              className="w-full rounded-lg shadow border"
-              style={{ minHeight: '80vh' }}
+              className="w-full rounded-lg shadow border min-h-[60vh] md:min-h-[80vh]"
               onLoad={() => setPdfLoading(false)}
               title="請求書PDF"
             />

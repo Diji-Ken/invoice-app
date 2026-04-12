@@ -8,6 +8,7 @@ import { useOrg } from '@/lib/org-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -73,16 +74,16 @@ export default function CustomersPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">{'\u53D6\u5F15\u5148'}</h1>
-        <Button render={<Link href="/customers/new" />}>
+        <Button render={<Link href="/customers/new" />} className="w-full sm:w-auto">
           <Plus className="size-4 mr-1" />
           {'\u65B0\u898F\u4F5C\u6210'}
         </Button>
       </div>
 
       {/* Search */}
-      <div className="relative mb-4 max-w-sm">
+      <div className="relative mb-4 sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
           value={search}
@@ -102,53 +103,102 @@ export default function CustomersPage() {
           </p>
         </div>
       ) : (
-        <div className="rounded-lg border bg-white">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{'\u4F1A\u793E\u540D'}</TableHead>
-                <TableHead>{'\u62C5\u5F53\u8005'}</TableHead>
-                <TableHead>{'\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9'}</TableHead>
-                <TableHead>{'\u652F\u6255\u65B9\u6CD5'}</TableHead>
-                <TableHead>{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((customer) => (
-                <TableRow
-                  key={customer.id}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/customers/${customer.id}`)}
-                >
-                  <TableCell className="font-medium">
-                    {customer.company_name}
-                  </TableCell>
-                  <TableCell>
-                    {customer.contact_person || '-'}
-                  </TableCell>
-                  <TableCell>
-                    {customer.email || '-'}
-                  </TableCell>
-                  <TableCell>
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block rounded-lg border bg-white">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{'\u4F1A\u793E\u540D'}</TableHead>
+                  <TableHead>{'\u62C5\u5F53\u8005'}</TableHead>
+                  <TableHead>{'\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9'}</TableHead>
+                  <TableHead>{'\u652F\u6255\u65B9\u6CD5'}</TableHead>
+                  <TableHead>{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((customer) => (
+                  <TableRow
+                    key={customer.id}
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/customers/${customer.id}`)}
+                  >
+                    <TableCell className="font-medium">
+                      {customer.company_name}
+                    </TableCell>
+                    <TableCell>
+                      {customer.contact_person || '-'}
+                    </TableCell>
+                    <TableCell>
+                      {customer.email || '-'}
+                    </TableCell>
+                    <TableCell>
+                      {paymentMethodLabels[customer.payment_method] ??
+                        customer.payment_method}
+                    </TableCell>
+                    <TableCell>
+                      {customer.is_active ? (
+                        <Badge className="bg-green-100 text-green-800 border-green-200">
+                          {'\u30A2\u30AF\u30C6\u30A3\u30D6'}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">
+                          {'\u7121\u52B9'}
+                        </Badge>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-3">
+            {filtered.map((customer) => (
+              <Card
+                key={customer.id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => router.push(`/customers/${customer.id}`)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 space-y-0.5">
+                      <p className="truncate text-sm font-bold">
+                        {customer.company_name}
+                      </p>
+                      {customer.contact_person && (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {customer.contact_person}
+                        </p>
+                      )}
+                      {customer.email && (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {customer.email}
+                        </p>
+                      )}
+                    </div>
+                    <div className="shrink-0">
+                      {customer.is_active ? (
+                        <Badge className="bg-green-100 text-green-800 border-green-200">
+                          {'\u30A2\u30AF\u30C6\u30A3\u30D6'}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">
+                          {'\u7121\u52B9'}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
                     {paymentMethodLabels[customer.payment_method] ??
                       customer.payment_method}
-                  </TableCell>
-                  <TableCell>
-                    {customer.is_active ? (
-                      <Badge className="bg-green-100 text-green-800 border-green-200">
-                        {'\u30A2\u30AF\u30C6\u30A3\u30D6'}
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">
-                        {'\u7121\u52B9'}
-                      </Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -228,8 +228,8 @@ export default function CustomerDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{customer.company_name}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="min-w-0 flex-1 truncate text-2xl font-bold">{customer.company_name}</h1>
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogTrigger
             render={
@@ -356,11 +356,19 @@ export default function CustomerDetailPage() {
       </Card>
 
       {/* Save / Back */}
-      <div className="flex items-center gap-3 justify-end">
-        <Button variant="outline" render={<Link href="/customers" />}>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <Button
+          variant="outline"
+          render={<Link href="/customers" />}
+          className="w-full sm:w-auto"
+        >
           {'\u623B\u308B'}
         </Button>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full sm:w-auto"
+        >
           {saving ? '\u4FDD\u5B58\u4E2D...' : '\u4FDD\u5B58'}
         </Button>
       </div>
@@ -376,40 +384,76 @@ export default function CustomerDetailPage() {
               {'\u8ACB\u6C42\u5C65\u6B74\u304C\u3042\u308A\u307E\u305B\u3093'}
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{'\u8ACB\u6C42\u756A\u53F7'}</TableHead>
-                  <TableHead>{'\u4EF6\u540D'}</TableHead>
-                  <TableHead className="text-right">{'\u91D1\u984D'}</TableHead>
-                  <TableHead>{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
-                  <TableHead>{'\u767A\u884C\u65E5'}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop table */}
+              <Table className="hidden md:table">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{'\u8ACB\u6C42\u756A\u53F7'}</TableHead>
+                    <TableHead>{'\u4EF6\u540D'}</TableHead>
+                    <TableHead className="text-right">{'\u91D1\u984D'}</TableHead>
+                    <TableHead>{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
+                    <TableHead>{'\u767A\u884C\u65E5'}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices.map((invoice) => (
+                    <TableRow
+                      key={invoice.id}
+                      className="cursor-pointer"
+                      onClick={() => router.push(`/invoices/${invoice.id}`)}
+                    >
+                      <TableCell className="font-medium">
+                        {invoice.invoice_number}
+                      </TableCell>
+                      <TableCell>{invoice.subject || '-'}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(invoice.total)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariant[invoice.status] ?? 'secondary'}>
+                          {statusLabels[invoice.status] ?? invoice.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{invoice.issue_date}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-3">
                 {invoices.map((invoice) => (
-                  <TableRow
+                  <div
                     key={invoice.id}
-                    className="cursor-pointer"
+                    className="cursor-pointer rounded-md border p-3 hover:bg-muted/50"
                     onClick={() => router.push(`/invoices/${invoice.id}`)}
                   >
-                    <TableCell className="font-medium">
-                      {invoice.invoice_number}
-                    </TableCell>
-                    <TableCell>{invoice.subject || '-'}</TableCell>
-                    <TableCell className="text-right">
-                      {formatCurrency(invoice.total)}
-                    </TableCell>
-                    <TableCell>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {invoice.invoice_number}
+                        </p>
+                        <p className="truncate text-sm font-medium">
+                          {invoice.subject || '-'}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-sm font-bold tabular-nums">
+                        {formatCurrency(invoice.total)}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2">
                       <Badge variant={statusVariant[invoice.status] ?? 'secondary'}>
                         {statusLabels[invoice.status] ?? invoice.status}
                       </Badge>
-                    </TableCell>
-                    <TableCell>{invoice.issue_date}</TableCell>
-                  </TableRow>
+                      <span className="text-xs text-muted-foreground">
+                        {invoice.issue_date}
+                      </span>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

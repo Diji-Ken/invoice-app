@@ -104,13 +104,16 @@ export default function RecurringPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">{'\u5B9A\u671F\u8ACB\u6C42'}</h1>
         <div className="flex gap-2">
           <Button variant="outline" size="icon" onClick={fetchRecurring}>
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Button onClick={() => router.push('/recurring/new')}>
+          <Button
+            onClick={() => router.push('/recurring/new')}
+            className="flex-1 sm:flex-initial"
+          >
             <Plus className="h-4 w-4 mr-2" />
             {'\u65B0\u898F\u4F5C\u6210'}
           </Button>
@@ -125,36 +128,85 @@ export default function RecurringPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{'\u53D6\u5F15\u5148'}</TableHead>
-                <TableHead>{'\u4EF6\u540D'}</TableHead>
-                <TableHead className="text-center">{'\u9001\u4ED8\u65E5'}</TableHead>
-                <TableHead className="text-right">{'\u91D1\u984D'}</TableHead>
-                <TableHead className="text-center">{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
-                <TableHead>{'\u6B21\u56DE\u751F\u6210'}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/recurring/${item.id}`)}
-                >
-                  <TableCell className="font-medium">
-                    {(item.customer as unknown as { company_name: string })?.company_name ?? '-'}
-                  </TableCell>
-                  <TableCell>{item.subject}</TableCell>
-                  <TableCell className="text-center">
-                    {'\u6BCE\u6708'}{item.send_day}{'\u65E5'}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    ¥{fmtCurrency(calcTotal(item))}
-                  </TableCell>
-                  <TableCell className="text-center">
+        <>
+          {/* Desktop table */}
+          <Card className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{'\u53D6\u5F15\u5148'}</TableHead>
+                  <TableHead>{'\u4EF6\u540D'}</TableHead>
+                  <TableHead className="text-center">{'\u9001\u4ED8\u65E5'}</TableHead>
+                  <TableHead className="text-right">{'\u91D1\u984D'}</TableHead>
+                  <TableHead className="text-center">{'\u30B9\u30C6\u30FC\u30BF\u30B9'}</TableHead>
+                  <TableHead>{'\u6B21\u56DE\u751F\u6210'}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/recurring/${item.id}`)}
+                  >
+                    <TableCell className="font-medium">
+                      {(item.customer as unknown as { company_name: string })?.company_name ?? '-'}
+                    </TableCell>
+                    <TableCell>{item.subject}</TableCell>
+                    <TableCell className="text-center">
+                      {'\u6BCE\u6708'}{item.send_day}{'\u65E5'}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      ¥{fmtCurrency(calcTotal(item))}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {item.is_active ? (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          {'\u30A2\u30AF\u30C6\u30A3\u30D6'}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200">
+                          {'\u505C\u6B62'}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {getNextGeneration(item)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-3">
+            {items.map((item) => (
+              <Card
+                key={item.id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => router.push(`/recurring/${item.id}`)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 space-y-1">
+                      <p className="truncate text-sm font-bold">
+                        {(item.customer as unknown as { company_name: string })?.company_name ?? '-'}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {item.subject}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-bold tabular-nums">
+                        ¥{fmtCurrency(calcTotal(item))}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {'\u6BCE\u6708'}{item.send_day}{'\u65E5'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2">
                     {item.is_active ? (
                       <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                         {'\u30A2\u30AF\u30C6\u30A3\u30D6'}
@@ -164,15 +216,15 @@ export default function RecurringPage() {
                         {'\u505C\u6B62'}
                       </Badge>
                     )}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {getNextGeneration(item)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
+                    <span className="text-xs text-muted-foreground">
+                      {getNextGeneration(item)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

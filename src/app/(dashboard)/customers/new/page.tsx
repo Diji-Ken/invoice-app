@@ -188,11 +188,19 @@ export default function NewCustomerPage() {
       </Card>
 
       {/* Actions */}
-      <div className="flex items-center gap-3 justify-end">
-        <Button variant="outline" render={<Link href="/customers" />}>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <Button
+          variant="outline"
+          render={<Link href="/customers" />}
+          className="w-full sm:w-auto"
+        >
           {'\u30AD\u30E3\u30F3\u30BB\u30EB'}
         </Button>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full sm:w-auto"
+        >
           {saving ? '\u4FDD\u5B58\u4E2D...' : '\u4FDD\u5B58'}
         </Button>
       </div>

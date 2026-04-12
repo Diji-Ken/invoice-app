@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -32,6 +32,22 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const supabase = createClient();
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [mobileOpen]);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -120,18 +136,20 @@ export function Sidebar() {
       </div>
 
       {/* Mobile overlay */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/30 md:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-200 md:hidden ${
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
 
       {/* Mobile sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 flex h-full w-64 flex-col bg-gray-50 transition-transform md:hidden ${
+        className={`fixed top-0 left-0 z-50 flex h-full w-64 flex-col bg-gray-50 shadow-xl transition-transform duration-200 ease-out md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        aria-hidden={!mobileOpen}
       >
         {navContent}
       </aside>
