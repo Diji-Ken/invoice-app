@@ -17,6 +17,11 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Auto-confirm email (skip confirmation email)
+  await supabase.auth.admin.updateUserById(userId, {
+    email_confirm: true,
+  });
+
   // Create organization
   const { data: org, error: orgError } = await supabase
     .from('organizations')
